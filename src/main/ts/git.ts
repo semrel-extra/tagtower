@@ -2,6 +2,7 @@ import child_process from 'node:child_process'
 import path from 'node:path'
 import os from 'node:os'
 import fs from 'node:fs/promises'
+import process from 'node:process'
 
 import {TAnnotatedTag, TTowerOpts} from './interface'
 
@@ -25,12 +26,17 @@ export const exec = (cmd: string, args?: string[], opts?: any): Promise<{stdout:
   })
 
   p.on('close', (code) => {
-    resolve({
+    const result = {
+      cmd,
+      args,
       code,
       stdout,
       stderr,
       duration: Date.now() - now
-    })
+    }
+
+    resolve(result)
+    process.env.DEBUG && console.log(result)
   })
 })
 
@@ -67,8 +73,11 @@ export const clone = async (url: string, branch = 'tagtower', _cwd?: string) => 
   if (remote.code === 128) {
     await exec('git', ['init'], opts)
     await exec('git', ['remote', 'add', 'origin', url], opts)
-    await exec('git', ['commit', '--allow-empty', '-m', 'init tagtower'], opts)
+    await setUserConfig(cwd)
+    await exec('git', ['commit', '--allow-empty', '-m', `init ${branch}`], opts)
     await exec('git', ['push', 'origin', `HEAD:${branch}`], opts)
+  } else {
+    await setUserConfig(cwd)
   }
 }
 
@@ -123,4 +132,9 @@ export const deleteTag = async (opts: TTowerOpts & {tag: string}) => {
     exec('git', ['push', '--delete', 'origin', opts.tag], {cwd}),
     exec('git', ['tag', '--delete', opts.tag], {cwd})
   ])
+}
+
+const setUserConfig = async (cwd: string) => {
+  await exec('git', ['config', 'user.name', process.env.GIT_COMMITTER_NAME || 'Semrel Extra Bot'], {cwd})
+  await exec('git', ['config', 'user.email', process.env.GIT_COMMITTER_EMAIL || 'semrel-extra-bot@hotmail.com'], {cwd})
 }
