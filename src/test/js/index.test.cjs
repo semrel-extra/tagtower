@@ -1,9 +1,9 @@
 const assert = require('node:assert')
 const { describe, it } = require('node:test')
-const { foo } = require('tagtower')
+const { createTower} = require('tagtower')
 
-describe('cjs foo()', () => {
+describe('cjs createTower()', () => {
   it('is callable', () => {
-    assert.equal(foo(), undefined)
+    assert.equal(typeof createTower, 'function')
   })
 })

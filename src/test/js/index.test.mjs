@@ -1,9 +1,9 @@
 import assert from 'node:assert'
 import { describe, it } from 'node:test'
-import { foo } from 'tagtower'
+import { createTower } from 'tagtower'
 
-describe('mjs foo()', () => {
+describe('mjs createTower()', () => {
   it('is callable', () => {
-    assert.equal(foo(), undefined)
+    assert.equal(typeof createTower, 'function')
   })
 })

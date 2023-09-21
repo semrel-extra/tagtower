@@ -8,7 +8,7 @@ import {TAnnotatedTag, TTowerOpts} from './interface'
 export const tempy = async () =>
   fs.mkdtemp(path.join(os.tmpdir(), 'tempy-tagtower-'))
 
-const _temp = await tempy()
+const _temp = tempy()
 
 export const exec = (cmd: string, args?: string[], opts?: any): Promise<{stdout: string, stderr: string, code?: number | null, duration: number}> => new Promise((resolve, reject) => {
   const now = Date.now()
@@ -35,7 +35,7 @@ export const exec = (cmd: string, args?: string[], opts?: any): Promise<{stdout:
 })
 
 const getCwd = async ({url, branch = 'tagtower', temp}: TTowerOpts) => {
-  const base = temp || await tempy()
+  const base = temp || await _temp
   const id = `${url.replaceAll(/[./:@]/g, '-')}-${branch}`.toLowerCase()
   const cwd = path.resolve(base, id)
 
@@ -50,7 +50,7 @@ const getCwd = async ({url, branch = 'tagtower', temp}: TTowerOpts) => {
 }
 
 export const clone = async (url: string, branch = 'tagtower', _cwd?: string) => {
-  const cwd = _cwd || _temp
+  const cwd = _cwd || await _temp
   const opts = {cwd}
   // https://github.blog/2020-12-21-get-up-to-speed-with-partial-clone-and-shallow-clone/
   const remote = await exec('git', [
@@ -72,7 +72,7 @@ export const clone = async (url: string, branch = 'tagtower', _cwd?: string) => 
   }
 }
 
-export const readTags = async (opts: TTowerOpts) => {
+export const readTags = async (opts: TTowerOpts): Promise<TAnnotatedTag[]> => {
   const cwd = await getCwd(opts)
   await exec('git', ['fetch', 'origin', 'refs/tags/*:refs/tags/*'], {cwd})
 
@@ -117,7 +117,7 @@ export const pushTags = async (opts: TTowerOpts & {tags: TAnnotatedTag[]}) => {
   await exec('git', ['push', 'origin', opts.tags[0].tag], {cwd})
 }
 
-export const delTag = async (opts: TTowerOpts & {tag: string}) => {
+export const deleteTag = async (opts: TTowerOpts & {tag: string}) => {
   const cwd = await getCwd(opts)
   return Promise.all([
     exec('git', ['push', '--delete', 'origin', opts.tag], {cwd}),

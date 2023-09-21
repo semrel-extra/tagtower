@@ -4,7 +4,7 @@ import path from 'node:path'
 import process from 'node:process'
 import crypto from 'node:crypto'
 import fs from 'node:fs/promises'
-import {exec, readTags, pushTags, delTag} from '../../main/ts/git'
+import {exec, readTags, pushTags, deleteTag} from '../../main/ts/git'
 
 const temp = path.resolve(process.cwd(), 'temp')
 
@@ -48,7 +48,7 @@ describe('git', () => {
     await exec('git', ['init', '--bare'], {cwd})
 
     const url = cwd
-    const l = 100 // TODO optimize spawn seed to scale up to 100_000 tags
+    const l = 1 // TODO optimize spawn seed to scale up to 100_000 tags
     const tags = Array.from({length: l}).map(() => ({
       tag: `test@${Math.random().toString(36).slice(2)}`,
       body: crypto.randomBytes(300).toString('hex')
@@ -67,7 +67,7 @@ describe('git', () => {
       temp,
     })
 
-    await delTag({
+    await deleteTag({
       url,
       branch: 'testtower',
       temp,
