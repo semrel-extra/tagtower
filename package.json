@@ -1,7 +1,7 @@
 {
-  "name": "@antongolub/blank-ts",
+  "name": "tagtower",
   "version": "0.0.0",
-  "description": "Blank TS package",
+  "description": "Tag driven git meta",
   "type": "module",
   "main": "target/cjs/index.cjs",
   "exports": {
@@ -32,14 +32,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/antongolub/blank-ts.git"
+    "url": "git+https://github.com/semrel-extra/tagtower.git"
   },
   "author": "Anton Golub <antongolub@antongolub.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/antongolub/blank-ts/issues"
+    "url": "https://github.com/semrel-extra/tagtower/issues"
   },
-  "homepage": "https://github.com/antongolub/blank-ts#readme",
+  "homepage": "https://github.com/semrel-extra/tagtower#readme",
   "dependencies": {},
   "devDependencies": {
     "@types/node": "^20.6.3",
