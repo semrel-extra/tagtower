@@ -36,7 +36,7 @@ export const exec = (cmd: string, args?: string[], opts?: any): Promise<{stdout:
 
 const getCwd = async ({url, branch = 'tagtower', temp}: TTowerOpts) => {
   const base = temp || await tempy()
-  const id = `${url.replaceAll(/[@\/.:]/g, '-')}-${branch}`
+  const id = `${url.replaceAll(/[./:@]/g, '-')}-${branch}`.toLowerCase()
   const cwd = path.resolve(base, id)
 
   try {
@@ -52,7 +52,17 @@ const getCwd = async ({url, branch = 'tagtower', temp}: TTowerOpts) => {
 export const clone = async (url: string, branch = 'tagtower', _cwd?: string) => {
   const cwd = _cwd || _temp
   const opts = {cwd}
-  const remote = await exec('git', ['clone', '-b', branch, '--depth', '1', url, '.'], opts)
+  // https://github.blog/2020-12-21-get-up-to-speed-with-partial-clone-and-shallow-clone/
+  const remote = await exec('git', [
+    'clone',
+    '--no-tags',
+    '--no-remote-submodules',
+    '--sparse',
+    '--single-branch',
+    '-b', branch,
+    '--depth', '1',
+    url, '.'
+  ], opts)
 
   if (remote.code === 128) {
     await exec('git', ['init'], opts)
@@ -66,8 +76,8 @@ export const readTags = async (opts: TTowerOpts) => {
   const cwd = await getCwd(opts)
   await exec('git', ['fetch', 'origin', 'refs/tags/*:refs/tags/*'], {cwd})
 
-  const raw = await exec('git', ['log', '--decorate-refs=refs/tags/*','--no-walk', '--tags', '--pretty=%D+++%B---', '--decorate=full'], {cwd})
-
+  // const raw = await exec('git', ['log', '--decorate-refs=refs/tags/*','--no-walk', '--tags', '--pretty=%D+++format=%(contents)---', '--decorate=full'], {cwd})
+  const raw = await exec('git', ['tag', '-l', '--format=%(refname)+++%(contents)---'], {cwd})
   return raw.stdout.trim().split('---').slice(0, -1).map(e => {
     const [ref, body] = e.split('+++')
 
@@ -80,9 +90,6 @@ export const readTags = async (opts: TTowerOpts) => {
 
 export const pushTags = async (opts: TTowerOpts & {tags: TAnnotatedTag[]}) => {
   const cwd = await getCwd(opts)
-
-  // const {stdout} = await exec('git', ['rev-parse', 'HEAD'], opts)
-  // return stdout.trim()
   const errors: string[] = []
   await Promise.all(opts.tags.map(async ({tag, body}) => {
     const result = await exec('git', ['tag', '-a', tag, '-m', body], {cwd})
@@ -92,9 +99,28 @@ export const pushTags = async (opts: TTowerOpts & {tags: TAnnotatedTag[]}) => {
     }
   }))
 
-  if (errors.length) {
+  if (errors.length > 0) {
     console.warn(errors.join('\n'))
   }
 
-  await exec('git', ['push', '--tags'], {cwd})
+  // const cmd = opts.tags.map(({tag, body}) => ['git', 'tag', '-a', tag, '-m', `"${body}"`, '&&']).flat().slice(0, -1).join(' ')
+  // console.log(await exec(cmd, [], {cwd}))
+
+  // const {stdout} = await exec('git', ['rev-parse', 'HEAD'], opts)
+  // return stdout.trim()
+
+  if (opts.tags.length > 1) {
+    await exec('git', ['push', 'origin', '--tags'], {cwd})
+    return
+  }
+
+  await exec('git', ['push', 'origin', opts.tags[0].tag], {cwd})
+}
+
+export const delTag = async (opts: TTowerOpts & {tag: string}) => {
+  const cwd = await getCwd(opts)
+  return Promise.all([
+    exec('git', ['push', '--delete', 'origin', opts.tag], {cwd}),
+    exec('git', ['tag', '--delete', opts.tag], {cwd})
+  ])
 }
