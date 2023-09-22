@@ -13,18 +13,18 @@ const tower = createTower({
   branch: 'tagtower'
 })
 
-const tag: string = 'some@tag'
-const entry: Record<string, any> = {
+const id: string = 'some@tag'
+const data: Record<string, any> = {
   hash: '3f9f0a88b411a8932bce289a3dd498d70a4dc96c',
   author: 'Anton Golub <antongolub@antongolub.com>',
   message: `feat: initial feat`
 }
 
-await tower.create(tag, entry)  // stores entry to the specified remote
-await tower.read(tag)           // returns found TEntry | null
+await tower.create(id, data)    // stores entry to the specified remote
+await tower.read(id)            // returns found TEntry | null
 await tower.read()              // if tag is empty, returns TEntry[]
-await tower.update(tag, entry)  // just a shortcut for delete & create
-await tower.delete(tag)         // void
+await tower.update(id, data)    // just a shortcut for delete & create
+await tower.delete(id)          // void
 ```
 
 ## License

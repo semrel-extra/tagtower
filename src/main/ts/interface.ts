@@ -1,11 +1,14 @@
 
-export type TTagEntry = Record<string, any>
+export type TTagEntry = {
+  id: string,
+  data: Record<string, any>
+}
 
 export type TTower = {
-  create(id: string, entry: TTagEntry): Promise<void>
-  read(id: string): Promise<TTagEntry|null>
+  create(id: string, data: TTagEntry['data']): Promise<void>
+  read(id: string): Promise<TTagEntry | null>
   read(): Promise<TTagEntry[]>
-  update(id: string, entry: TTagEntry): Promise<void>
+  update(id: string, data: TTagEntry['data']): Promise<void>
   delete(id: string): Promise<void>
 }
 
