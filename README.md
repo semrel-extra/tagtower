@@ -14,8 +14,8 @@ import {createTower} from 'tagtower'
 
 const tower = createTower({
   url:            'https://<token>github.com/git/repo.git',
-  branch:         'tagtower',
-  temp:           './temp',       // A dir to hold temporary git channels. Defaults to fs.mkdtemp(path.join(os.tmpdir(), 'tempy-tagtower-'))
+  branch:         'tagtower',     // Branch for storing tags. Defaults to 'tagtower'
+  temp:           './temp',       // Dir to hold temporary git channels. Defaults to fs.mkdtemp(path.join(os.tmpdir(), 'tempy-tagtower-'))
   committerName:  'Foo Bar',      // Username and email to sign annotaged git tags
   committerEmail: 'foo@bar.baz'   // Defaults to Semrel Extra Bot <semrel-extra-bot@hotmail.com>
 })
