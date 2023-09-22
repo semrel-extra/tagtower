@@ -1,6 +1,6 @@
 {
   "name": "tagtower",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Tag-driven git index",
   "type": "module",
   "main": "target/cjs/index.cjs",
