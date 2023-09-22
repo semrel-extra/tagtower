@@ -14,7 +14,13 @@ export type TTower = {
 
 export type TTowerFactory = (opts: TTowerOpts) => TTower
 
-export type TTowerOpts = {url: string, branch?: string, temp?: string}
+export type TTowerOpts = {
+  url: string
+  branch?: string
+  temp?: string
+  committerName?: string
+  committerEmail?: string
+}
 
 export type TAnnotatedTag = {
   tag: string

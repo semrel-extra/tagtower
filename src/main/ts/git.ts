@@ -40,7 +40,13 @@ export const exec = (cmd: string, args?: string[], opts?: any): Promise<{stdout:
   })
 })
 
-const getCwd = async ({url, branch = 'tagtower', temp}: TTowerOpts) => {
+const getCwd = async ({
+  url,
+  branch = 'tagtower',
+  temp,
+  committerName = process.env.GIT_COMMITTER_NAME || 'Semrel Extra Bot',
+  committerEmail = process.env.GIT_COMMITTER_EMAIL || 'semrel-extra-bot@hotmail.com'
+}: TTowerOpts) => {
   const base = temp || await _temp
   const id = `${url.replaceAll(/[./:@]/g, '-')}-${branch}`.toLowerCase()
   const cwd = path.resolve(base, id)
@@ -49,14 +55,13 @@ const getCwd = async ({url, branch = 'tagtower', temp}: TTowerOpts) => {
     await fs.access(cwd)
   } catch {
     await fs.mkdir(cwd, { recursive: true })
-    await clone(url, branch, cwd)
+    await clone({url, branch, cwd, committerName, committerEmail})
   }
 
   return cwd
 }
 
-export const clone = async (url: string, branch = 'tagtower', _cwd?: string) => {
-  const cwd = _cwd || await _temp
+export const clone = async ({url, branch, cwd, committerName, committerEmail}: {url: string, branch: string, cwd: string, committerName: string, committerEmail: string}) => {
   const opts = {cwd}
   // https://github.blog/2020-12-21-get-up-to-speed-with-partial-clone-and-shallow-clone/
   const remote = await exec('git', [
@@ -73,11 +78,11 @@ export const clone = async (url: string, branch = 'tagtower', _cwd?: string) => 
   if (remote.code === 128) {
     await exec('git', ['init'], opts)
     await exec('git', ['remote', 'add', 'origin', url], opts)
-    await setUserConfig(cwd)
+    await setUserConfig(cwd, committerName, committerEmail)
     await exec('git', ['commit', '--allow-empty', '-m', `init ${branch}`], opts)
     await exec('git', ['push', 'origin', `HEAD:${branch}`], opts)
   } else {
-    await setUserConfig(cwd)
+    await setUserConfig(cwd, committerName, committerEmail)
   }
 }
 
@@ -112,12 +117,6 @@ export const pushTags = async (opts: TTowerOpts & {tags: TAnnotatedTag[]}) => {
     console.warn(errors.join('\n'))
   }
 
-  // const cmd = opts.tags.map(({tag, body}) => ['git', 'tag', '-a', tag, '-m', `"${body}"`, '&&']).flat().slice(0, -1).join(' ')
-  // console.log(await exec(cmd, [], {cwd}))
-
-  // const {stdout} = await exec('git', ['rev-parse', 'HEAD'], opts)
-  // return stdout.trim()
-
   if (opts.tags.length > 1) {
     await exec('git', ['push', 'origin', '--tags'], {cwd})
     return
@@ -134,7 +133,7 @@ export const deleteTag = async (opts: TTowerOpts & {tag: string}) => {
   ])
 }
 
-const setUserConfig = async (cwd: string) => {
-  await exec('git', ['config', 'user.name', process.env.GIT_COMMITTER_NAME || 'Semrel Extra Bot'], {cwd})
-  await exec('git', ['config', 'user.email', process.env.GIT_COMMITTER_EMAIL || 'semrel-extra-bot@hotmail.com'], {cwd})
+const setUserConfig = async (cwd: string, committerName: string, committerEmail: string) => {
+  await exec('git', ['config', 'user.name', committerName], {cwd})
+  await exec('git', ['config', 'user.email', committerEmail], {cwd})
 }
