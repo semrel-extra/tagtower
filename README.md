@@ -29,7 +29,8 @@ const tower = createTower({
   committerName:  'Foo Bar',      // Username and email to sign annotaged git tags
   committerEmail: 'foo@bar.baz',  // Defaults to Semrel Extra Bot <semrel-extra-bot@hotmail.com>
   format:         v => v + '',    // Opt value formatter. Defaults to JSON.stringify
-  parse:          v => v          // Opt parser. Defaults to JSON.parse
+  parse:          v => v,         // Opt parser. Defaults to JSON.parse
+  filter:         v => v % 2      // Opt low level filter (applied before parse). Defaults to () => true
 })
 
 const id: string = 'some@tag'

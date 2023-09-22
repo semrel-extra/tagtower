@@ -1,5 +1,5 @@
 import {readTags, deleteTag, pushTags} from './git'
-import {TTagEntry, TTower, TTowerFactory, TTowerOpts} from './interface'
+import {TFilter, TTagEntry, TTower, TTowerFactory, TTowerOpts} from './interface'
 
 export const createTower: TTowerFactory = (opts: TTowerOpts): TTower => ({
   async create(tag, data){
@@ -8,14 +8,18 @@ export const createTower: TTowerFactory = (opts: TTowerOpts): TTower => ({
   },
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  async read(id?: string) {
+  async read(id?: string | TFilter) {
     const parser = opts.parse || parse
-    const entries: TTagEntry[] = (await readTags(opts)).map(({tag: id, body}) => ({id, data: parser(body)}))
-    if (id === undefined) {
-      return entries
+    const predicate = typeof id === 'function' ? id : (opts.filter || filter)
+    const entries: TTagEntry[] = (await readTags(opts))
+      .filter(predicate)
+      .map(({tag: id, body}) => ({id, data: parser(body)}))
+
+    if (typeof id === 'string') {
+      return entries.find(({id: _id}) => _id === id) || null
     }
 
-    return entries.find(({id: _id}) => _id === id) || null
+    return entries
   },
   async delete(tag) {
     await deleteTag({...opts, tag})
@@ -26,6 +30,7 @@ export const createTower: TTowerFactory = (opts: TTowerOpts): TTower => ({
   }
 })
 
+const filter = () => true
 const format = JSON.stringify
 const parse = (value: any): TTagEntry['data'] => {
   try {

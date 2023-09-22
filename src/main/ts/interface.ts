@@ -4,10 +4,12 @@ export type TTagEntry = {
   data: any
 }
 
+export type TFilter = (v: {tag: string, body: string}) => boolean
+
 export type TTower = {
   create(id: string, data: TTagEntry['data']): Promise<void>
   read(id: string): Promise<TTagEntry | null>
-  read(): Promise<TTagEntry[]>
+  read(fn?: TFilter): Promise<TTagEntry[]>
   update(id: string, data: TTagEntry['data']): Promise<void>
   delete(id: string): Promise<void>
 }
@@ -22,6 +24,7 @@ export type TTowerOpts = {
   committerEmail?: string
   parse?: (v: string) => any
   format?: (v: any) => string
+  filter?: TFilter
 }
 
 export type TAnnotatedTag = {

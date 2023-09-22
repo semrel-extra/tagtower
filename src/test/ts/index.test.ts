@@ -41,7 +41,7 @@ describe('tagTower', () => {
     assert.equal(await tower.read(id), null)
   })
 
-  it('supports custom parse/format', async () => {
+  it('supports custom parse, format & filter', async () => {
     const cwd = path.resolve(temp, 'custom-format')
     await fs.mkdir(cwd, { recursive: true })
     await exec('git', ['init', '--bare'], {cwd})
@@ -55,6 +55,10 @@ describe('tagTower', () => {
     })
 
     await tower.create('foo', 'bar')
+    await tower.create('baz', 'qux')
     assert.equal((await tower.read('foo'))?.data, '++bar++')
+
+    const filtered = await tower.read(({tag}) => tag === 'foo')
+    assert.deepEqual(filtered, [{id: 'foo', data: '++bar++'}])
   })
 })
