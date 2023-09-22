@@ -1,4 +1,8 @@
 # tagtower
+[![Maintainability](https://api.codeclimate.com/v1/badges/88b8163c3bc008afafc1/maintainability)](https://codeclimate.com/github/semrel-extra/tagtower/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/88b8163c3bc008afafc1/test_coverage)](https://codeclimate.com/github/semrel-extra/tagtower/test_coverage)
+[![npm (tag)](https://img.shields.io/npm/v/tagtower)](https://www.npmjs.com/package/tagtower)
+
 > Tag-driven git index
 
 ## Motivation
