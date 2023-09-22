@@ -6,7 +6,17 @@
 > Tag-driven git index
 
 ## Motivation
-It does not seem possible [to get commits info w/o repo cloning](https://stackoverflow.com/questions/20055398/is-it-possible-to-get-commit-logs-messages-of-a-remote-git-repo-without-git-clon). This limitation brings a significant performance impact on conventional-commits driven release flows (especially if [git notes](https://git-scm.com/docs/git-notes) API is not supported by VCS). But what if we'd have a side index with web-hooks triggers instead. Let's find out.
+It does not seem possible [to get commits info w/o repo cloning](https://stackoverflow.com/questions/20055398/is-it-possible-to-get-commit-logs-messages-of-a-remote-git-repo-without-git-clon). This limitation brings a significant performance impact on [conventional-commits](https://www.conventionalcommits.org/en/v1.0.0/) driven release flows (especially if [git notes](https://git-scm.com/docs/git-notes) API is not supported by VCS). But what if we'd have a side index with web-hooks triggers instead. Let's find out.
+
+_— Looks like a kv-storage based on git tags. This is madness._  
+_— True._
+
+As a part of «how self-sufficient git is» research.
+
+## Install
+```sh
+yarn add tagtower
+```
 
 ## Usage
 ```ts
