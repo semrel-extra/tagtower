@@ -40,4 +40,21 @@ describe('tagTower', () => {
     await tower.delete(id)
     assert.equal(await tower.read(id), null)
   })
+
+  it('supports custom parse/format', async () => {
+    const cwd = path.resolve(temp, 'custom-format')
+    await fs.mkdir(cwd, { recursive: true })
+    await exec('git', ['init', '--bare'], {cwd})
+
+    const tower = createTower({
+      url: cwd,
+      branch: 'test-tag-tower',
+      temp,
+      format(v) { return `--${v}--`},
+      parse(v) { return `++${v.trim().slice(2, -2)}++` }
+    })
+
+    await tower.create('foo', 'bar')
+    assert.equal((await tower.read('foo'))?.data, '++bar++')
+  })
 })

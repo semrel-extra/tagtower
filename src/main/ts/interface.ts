@@ -1,7 +1,7 @@
 
 export type TTagEntry = {
   id: string,
-  data: Record<string, any>
+  data: any
 }
 
 export type TTower = {
@@ -20,6 +20,8 @@ export type TTowerOpts = {
   temp?: string
   committerName?: string
   committerEmail?: string
+  parse?: (v: string) => any
+  format?: (v: any) => string
 }
 
 export type TAnnotatedTag = {
